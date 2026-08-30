@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>For My Sister</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&family=Noto+Sans+Telugu:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --plum-dark:#241220;
+    --plum:#3a1f34;
+    --plum-light:#5c2f4f;
+    --rose:#e3aebd;
+    --rose-soft:#f1c9d3;
+    --gold:#cea45a;
+    --gold-bright:#e8c98a;
+    --ivory:#faf3ea;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+  html,body{
+    height:100%;
+    width:100%;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% 0%, var(--plum-light) 0%, var(--plum) 45%, var(--plum-dark) 100%);
+    overflow-x:hidden;
+    font-family:'Jost', sans-serif;
+    color:var(--ivory);
+  }
+
+  body{
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    padding:24px 20px;
+    overflow-x:hidden;
+  }
+
+  /* ambient glow */
+  .glow{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(206,164,90,0.10), transparent 55%);
+    z-index:0;
+  }
+
+  /* stars / sparkle dust */
+  .sparkle{
+    position:fixed;
+    border-radius:50%;
+    background:var(--gold-bright);
+    opacity:0;
+    pointer-events:none;
+    animation:twinkle 5.5s ease-in-out infinite;
+    z-index:2;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:0; transform:scale(0.6); }
+    50%{ opacity:.5; transform:scale(1); }
+  }
+
+  /* floating little hearts released on open */
+  .float-heart{
+    position:fixed;
+    pointer-events:none;
+    z-index:2;
+    opacity:0;
+    animation:heartRise 2.6s ease-out forwards;
+  }
+  .float-heart svg{ width:100%; height:100%; display:block; }
+  @keyframes heartRise{
+    0%{ opacity:0; transform:translateY(0) scale(0.5); }
+    12%{ opacity:0.75; }
+    100%{ opacity:0; transform:translateY(-140px) scale(1); }
+  }
+  /* gentle, persistent hearts that stay near the letter after it settles */
+  .float-heart.ambient{
+    animation:ambientHeartFloat 5.5s ease-in-out infinite;
+  }
+  @keyframes ambientHeartFloat{
+    0%{ opacity:0; transform:translateY(6px) scale(0.85); }
+    18%{ opacity:0.45; }
+    50%{ opacity:0.6; transform:translateY(-6px) scale(1); }
+    82%{ opacity:0.45; }
+    100%{ opacity:0; transform:translateY(-14px) scale(0.88); }
+  }
+
+  /* falling petals */
+  .petal-field{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:2;
+  }
+  .petal{
+    position:absolute;
+    top:-40px;
+    width:14px;
+    height:14px;
+    opacity:0.85;
+    animation-name:fall, sway;
+    animation-timing-function:linear, ease-in-out;
+    animation-iteration-count:infinite, infinite;
+    will-change:transform;
+  }
+  .petal svg{ width:100%; height:100%; display:block; }
+  @keyframes fall{
+    from{ transform:translateY(-5vh) rotate(0deg); }
+    to{ transform:translateY(110vh) rotate(340deg); }
+  }
+  @keyframes sway{
+    0%,100%{ margin-left:0; }
+    50%{ margin-left:var(--sway, 40px); }
+  }
+
+  /* ---------- stage ---------- */
+  .stage{
+    position:relative;
+    z-index:3;
+    width:100%;
+    max-width:560px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  .eyebrow{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    letter-spacing:0.12em;
+    font-size:15px;
+    color:var(--rose-soft);
+    opacity:0.85;
+    margin-bottom:10px;
+    text-transform:lowercase;
+    transition:opacity .5s ease, visibility 0s linear 0s;
+  }
+
+  .title{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    font-size:clamp(28px, 7vw, 46px);
+    line-height:1.15;
+    color:var(--ivory);
+    margin-bottom:6px;
+    letter-spacing:0.01em;
+    transition:opacity .5s ease, visibility 0s linear 0s;
+  }
+  .title em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--gold-bright);
+  }
+
+  .stage.revealed .eyebrow,
+  .stage.revealed .title{
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .5s ease, visibility 0s linear .5s;
+  }
+
+  .sub-eyebrow{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:14px;
+    letter-spacing:0.08em;
+    color:var(--rose-soft);
+    opacity:0.6;
+    margin-top:6px;
+  }
+
+  .hint{
+    font-size:13px;
+    letter-spacing:0.06em;
+    color:var(--rose-soft);
+    opacity:0.85;
+    margin-top:26px;
+    height:16px;
+    animation:pulseHint 2.6s ease-in-out infinite;
+    transition:opacity .4s ease;
+  }
+  .hint.hidden{ opacity:0 !important; visibility:hidden; pointer-events:none; }
+  @keyframes pulseHint{
+    0%,100%{ opacity:0.6; }
+    50%{ opacity:1; }
+  }
+
+  /* ---------- envelope ---------- */
+  .envelope-wrap{
+    margin-top:34px;
+    perspective:1200px;
+  }
+
+  .envelope{
+    position:relative;
+    width:260px;
+    height:172px;
+    transform-style:preserve-3d;
+    animation:float 4.5s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{ transform:translateY(0px); }
+    50%{ transform:translateY(-10px); }
+  }
+
+  .envelope.opened{ animation:none; }
+
+  .env-back{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(155deg, #eddcc7, var(--ivory) 60%);
+    border-radius:6px;
+    box-shadow:
+      0 20px 45px rgba(10,4,10,0.55),
+      0 2px 0 rgba(255,255,255,0.4) inset;
+  }
+
+  .letter{
+    position:absolute;
+    left:6px; right:6px;
+    top:8px;
+    min-height:190px;
+    background:
+      linear-gradient(180deg, #fffdf9, #fbf3e6);
+    border:1px solid rgba(206,164,90,0.35);
+    border-radius:3px;
+    box-shadow:0 8px 22px rgba(10,4,10,0.35);
+    transform:translateY(0) scale(0.99);
+    transition:transform 1.15s cubic-bezier(.2,.85,.25,1) 0.35s;
+    z-index:1;
+    padding:24px 20px 20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+  }
+  .envelope.opened .letter{
+    transform:translateY(-128px) scale(1);
+  }
+
+  .letter-mark{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:13px;
+    letter-spacing:0.14em;
+    color:var(--gold);
+    text-transform:lowercase;
+    opacity:0;
+    transition:opacity .6s ease .95s;
+  }
+  .envelope.opened .letter-mark{ opacity:1; }
+
+  .letter-text{
+    font-family:'Cormorant Garamond', serif;
+    font-size:clamp(16px, 4vw, 18px);
+    line-height:1.62;
+    color:#3a2b22;
+    opacity:0;
+    transform:translateY(6px) scale(0.95);
+    transition:opacity .9s ease 1.35s, transform .9s ease 1.35s;
+  }
+  .envelope.opened .letter-text{ opacity:1; transform:translateY(0) scale(1); }
+  .letter-text .accent{
+    font-style:italic;
+    color:var(--plum-light);
+  }
+
+  .letter-telugu{
+    font-family:'Noto Sans Telugu', 'Cormorant Garamond', serif;
+    font-size:clamp(11.5px, 2.9vw, 13px);
+    line-height:1.7;
+    color:var(--plum-light);
+    margin-top:10px;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .9s ease 1.6s, transform .9s ease 1.6s;
+  }
+  .envelope.opened .letter-telugu{ opacity:0.72; transform:translateY(0); }
+
+  .letter-sign{
+    margin-top:14px;
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--gold);
+    opacity:0;
+    transition:opacity .8s ease 1.8s;
+  }
+  .envelope.opened .letter-sign{ opacity:1; }
+
+  .letter-final{
+    margin-top:12px;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:13px;
+    letter-spacing:0.04em;
+    color:var(--rose);
+    opacity:0;
+    transition:opacity 1s ease 2.6s;
+  }
+  .envelope.opened .letter-final{ opacity:0.85; }
+
+  .env-front{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 2px 0 rgba(255,255,255,0.25) inset;
+    transition:opacity .5s ease .55s;
+  }
+  .envelope.opened .env-front{ opacity:0; pointer-events:none; }
+
+  .env-front .body{
+    position:absolute; inset:0;
+    background:linear-gradient(155deg, #f6ead9, #eddcc4 70%);
+    clip-path:polygon(0 22%, 100% 22%, 100% 100%, 0 100%);
+  }
+  .env-front .flap{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:60%;
+    background:linear-gradient(160deg, #f9efe1, #e9d6bb);
+    clip-path:polygon(0 0, 100% 0, 50% 82%);
+    transform-origin:top center;
+    transition:transform .85s cubic-bezier(.4,0,.2,1) .18s;
+    z-index:3;
+  }
+  .envelope.opened .env-front .flap{
+    transform:rotateX(180deg);
+  }
+
+  .heart-btn{
+    position:absolute;
+    left:50%; top:40%;
+    width:40px; height:40px;
+    transform:translate(-50%,-50%) scale(1);
+    border:none;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #e0a5b0, #b9576b 75%);
+    box-shadow:
+      0 3px 8px rgba(0,0,0,0.4),
+      0 0 0 0 rgba(224,165,176,0.5);
+    display:flex; align-items:center; justify-content:center;
+    z-index:4;
+    cursor:pointer;
+    padding:0;
+    transition:transform .5s cubic-bezier(0.22,1,0.36,1);
+    animation:heartGlow 3.6s ease-in-out infinite;
+  }
+  @keyframes heartGlow{
+    0%,100%{ box-shadow:0 3px 8px rgba(0,0,0,0.4), 0 0 0 0 rgba(224,165,176,0.4); }
+    50%{ box-shadow:0 3px 10px rgba(0,0,0,0.4), 0 0 13px 4px rgba(224,165,176,0.32); }
+  }
+  .heart-btn svg{ width:19px; height:19px; opacity:0.95; }
+  .heart-btn:hover, .heart-btn:focus-visible{ transform:translate(-50%,-50%) scale(1.07); }
+  .heart-btn.tapped{ transform:translate(-50%,-50%) scale(1.16); transition-duration:.3s; }
+  .envelope.opened .heart-btn{ opacity:0; pointer-events:none; transform:translate(-50%,-50%) scale(0.3); transition:opacity .35s ease, transform .35s ease; }
+  .heart-btn:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:3px; }
+
+  .footer-note{
+    margin-top:26px;
+    font-size:12px;
+    letter-spacing:0.08em;
+    color:var(--rose-soft);
+    opacity:0.55;
+  }
+
+  @media (max-width:480px){
+    .envelope{ width:230px; height:152px; }
+    .envelope.opened .letter{ transform:translateY(-112px) scale(1); }
+    .stage{ padding:0 4px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .envelope, .petal, .hint, .sparkle, .heart-btn, .float-heart{ animation:none !important; }
+    .letter, .letter-text, .letter-telugu, .env-front .flap, .heart-btn{
+      transition-duration:.3s !important;
+      transition-delay:0s !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="glow"></div>
+  <div class="petal-field" id="petalField"></div>
+
+  <div class="stage">
+    <div class="eyebrow">a little note, just for you</div>
+    <h1 class="title">To my sister<br><em>Shyamala</em></h1>
+
+    <div class="envelope-wrap">
+      <div class="envelope" id="envelope">
+        <div class="letter">
+          <p class="letter-text">Wishing you both <span class="accent">endless love</span>, happiness, and beautiful moments together. ❤️</p>
+          <p class="letter-telugu">పెళ్లిరోజు శుభాకాంక్షలు అక్కా ❤️</p>
+        </div>
+        <div class="env-back"></div>
+        <div class="env-front">
+          <div class="body"></div>
+          <div class="flap"></div>
+        </div>
+        <button class="heart-btn" id="heartBtn" type="button" aria-label="Open the letter">
+          <svg viewBox="0 0 24 24" fill="#fff" stroke="none">
+            <path d="M12 20s-7-4.5-7-10a4.5 4.5 0 0 1 7-3.7A4.5 4.5 0 0 1 19 10c0 5.5-7 10-7 10z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="hint" id="hint">tap the envelope to open</div>
+  </div>
+
+<script>
+  const envelope = document.getElementById('envelope');
+  const heartBtn = document.getElementById('heartBtn');
+  const hint = document.getElementById('hint');
+  const stage = document.querySelector('.stage');
+  const petalField = document.getElementById('petalField');
+  let opened = false;
+
+  function openEnvelope(){
+    if(opened) return;
+    opened = true;
+
+    // Step 1: heart briefly glows and scales
+    heartBtn.classList.add('tapped');
+
+    // hide the opening-screen heading completely, and the old instruction
+    stage.classList.add('revealed');
+    hint.classList.add('hidden');
+
+    // Step 2-4: flap opens, letter rises and settles (staggered via CSS transition-delays)
+    requestAnimationFrame(()=>{
+      envelope.classList.add('opened');
+    });
+
+    // Step 6: background petals become briefly more active
+    activatePetals();
+
+    // Step 5: a small burst of tiny hearts float upward as the letter rises
+    setTimeout(()=>releaseHearts(7, 600), 250);
+
+    // a few soft sparkles once the letter has mostly settled
+    setTimeout(burstSparkles, 1500);
+
+    // Step 7: settle into a few tiny hearts/sparkles lingering quietly around the letter
+    setTimeout(ambientReveal, 2600);
+  }
+
+  heartBtn.addEventListener('click', openEnvelope);
+  heartBtn.addEventListener('keypress', (e)=>{
+    if(e.key === 'Enter' || e.key === ' ') openEnvelope();
+  });
+
+  // falling petals
+  const petalColors = ['#e3aebd', '#f1c9d3', '#cea45a', '#d98fa3'];
+
+  function petalSVG(color){
+    return `<svg viewBox="0 0 20 20"><path d="M10 0 C16 4 16 12 10 20 C4 12 4 4 10 0 Z" fill="${color}" opacity="0.9"/></svg>`;
+  }
+
+  function makePetal(size, duration, swayDuration, delay, left, color){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    p.style.left = left + 'vw';
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.animationDuration = duration + 's, ' + swayDuration + 's';
+    p.style.animationDelay = delay + 's, ' + (Math.random()*-3) + 's';
+    const swayAmount = (18 + Math.random()*35) * (Math.random() < 0.5 ? -1 : 1);
+    p.style.setProperty('--sway', swayAmount + 'px');
+    p.innerHTML = petalSVG(color);
+    petalField.appendChild(p);
+    return p;
+  }
+
+  const PETAL_COUNT = 18;
+  for(let i=0;i<PETAL_COUNT;i++){
+    const size = 10 + Math.random()*10;
+    const duration = 10 + Math.random()*8;
+    const swayDuration = 3 + Math.random()*3;
+    const delay = Math.random()*-14;
+    const left = Math.random()*100;
+    const color = petalColors[Math.floor(Math.random()*petalColors.length)];
+    makePetal(size, duration, swayDuration, delay, left, color);
+  }
+
+  function activatePetals(){
+    // a light flourish of a few extra, faster petals when the letter opens
+    for(let i=0;i<10;i++){
+      const size = 9 + Math.random()*9;
+      const duration = 5 + Math.random()*3;
+      const swayDuration = 2 + Math.random()*2;
+      const left = Math.random()*100;
+      const color = petalColors[Math.floor(Math.random()*petalColors.length)];
+      const p = makePetal(size, duration, swayDuration, 0, left, color);
+      setTimeout(()=>p.remove(), (duration+1)*1000);
+    }
+  }
+
+  // ambient sparkle dust
+  function spawnSparkle(x, y, delay){
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    const size = 2 + Math.random()*3;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = x+'px';
+    s.style.top = y+'px';
+    s.style.animationDelay = delay+'s';
+    s.style.animationDuration = (3+Math.random()*3)+'s';
+    document.body.appendChild(s);
+  }
+  for(let i=0;i<13;i++){
+    spawnSparkle(Math.random()*window.innerWidth, Math.random()*window.innerHeight, Math.random()*4);
+  }
+
+  function burstSparkles(){
+    const rect = envelope.getBoundingClientRect();
+    for(let i=0;i<9;i++){
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      const size = 3 + Math.random()*4;
+      const angle = Math.random()*Math.PI*2;
+      const dist = 50 + Math.random()*110;
+      const x = rect.left + rect.width/2 + Math.cos(angle)*dist;
+      const y = rect.top + rect.height/2 + Math.sin(angle)*dist - 100;
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.left = x+'px';
+      s.style.top = y+'px';
+      s.style.position = 'fixed';
+      s.style.animation = 'twinkle 1.8s ease-out forwards';
+      s.style.animationDelay = (Math.random()*0.35)+'s';
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(), 2600);
+    }
+  }
+
+  // small hearts drifting upward around the envelope as it opens
+  function releaseHearts(count, spread){
+    const rect = envelope.getBoundingClientRect();
+    for(let i=0;i<count;i++){
+      setTimeout(()=>{
+        const h = document.createElement('div');
+        h.className = 'float-heart';
+        const size = 10 + Math.random()*8;
+        const x = rect.left + rect.width/2 + (Math.random()*120-60);
+        const y = rect.top + rect.height*0.5 + (Math.random()*30-15);
+        h.style.width = size+'px';
+        h.style.height = size+'px';
+        h.style.left = x+'px';
+        h.style.top = y+'px';
+        h.innerHTML = `<svg viewBox="0 0 24 24" fill="#e3aebd"><path d="M12 20s-7-4.5-7-10a4.5 4.5 0 0 1 7-3.7A4.5 4.5 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>`;
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(), 2700);
+      }, i * (spread / count));
+    }
+  }
+
+  // Step 7: once the letter has settled, leave a few tiny hearts and sparkles
+  // quietly floating just outside the letter — always behind the text.
+  function ambientReveal(){
+    const letterEl = envelope.querySelector('.letter');
+    const rect = letterEl.getBoundingClientRect();
+    const spots = [
+      { dx:-rect.width*0.52, dy:-rect.height*0.18 },
+      { dx: rect.width*0.54, dy:-rect.height*0.08 },
+      { dx:-rect.width*0.42, dy: rect.height*0.55 },
+      { dx: rect.width*0.46, dy: rect.height*0.62 },
+    ];
+
+    spots.forEach((spot, i)=>{
+      // a soft sparkle near this spot
+      spawnSparkle(
+        rect.left + rect.width/2 + spot.dx,
+        rect.top + rect.height/2 + spot.dy,
+        i * 0.7
+      );
+
+      // a slowly floating, persistent tiny heart nearby
+      const h = document.createElement('div');
+      h.className = 'float-heart ambient';
+      const size = 8 + Math.random()*6;
+      h.style.width = size+'px';
+      h.style.height = size+'px';
+      h.style.left = (rect.left + rect.width/2 + spot.dx*0.7) + 'px';
+      h.style.top = (rect.top + rect.height/2 + spot.dy*0.7) + 'px';
+      h.style.animationDelay = (i * 0.9) + 's';
+      h.innerHTML = `<svg viewBox="0 0 24 24" fill="#e3aebd"><path d="M12 20s-7-4.5-7-10a4.5 4.5 0 0 1 7-3.7A4.5 4.5 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>`;
+      document.body.appendChild(h);
+    });
+  }
+</script>
+
+</body>
+</html>
